@@ -2,8 +2,9 @@
 
 The whole entry is a single sentence about the oldest developer truth
 there is: a green test suite is not proof the code is right, only proof
-the bug has not been caught yet. The script validates the line and drops
-it into /output/entry.txt.
+the bug has not been caught yet. The script validates the line against
+the bounty gate (one sentence, 1-120 characters, ends with a full stop)
+and writes it — with no trailing newline — to /output/entry.txt.
 """
 
 from pathlib import Path
@@ -31,6 +32,8 @@ def validate(line: str) -> str:
         )
     if "\n" in text:
         raise ValueError("fortune must be a single line")
+    if any(ord(ch) < 32 or ord(ch) == 127 for ch in text):
+        raise ValueError("fortune must not contain control characters")
     if not text.endswith("."):
         raise ValueError("fortune must end with a full stop")
     if ". " in text:
